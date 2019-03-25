@@ -1,0 +1,144 @@
+Sub StockMarketData():
+
+' --------------------------------------------------------------------------------
+ 
+Dim TickerRow As Integer
+Dim ws As Worksheet
+Dim LastRow As Long
+Dim YrOpenVal As Double
+Dim YrCloseVal As Double
+Dim YearlyChange As Double
+Dim TotalVol As Single
+Dim PercentChange As Double
+Dim LastTicker As Long
+Dim GrIncRow As Integer
+Dim GrDecRow As Integer
+Dim GrTotVolRow As Single
+
+
+ '================= EASY & MODERATE==========
+'--------------------------------------------------------
+
+For Each ws In Worksheets
+
+    ws.Range("I1") = "Ticker"
+    ws.Range("J1") = "Total Stock Volume"
+    TickerRow = 2
+
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    ws.Range("J1").EntireColumn.Insert
+    ws.Cells(1, 10).Value = "Yearly Change"
+    ws.Range("K1").EntireColumn.Insert
+    ws.Cells(1, 11).Value = "Percent Change"
+
+    YrOpenVal = 0
+    YrCloseVal = 0
+    YearlyChange = 0
+    PercentChange = 0
+
+
+    For i = 2 To LastRow
+
+        If (ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value) Then                                      'current ticker is not equal to next ticker
+           ws.Cells(TickerRow, 9).Value = ws.Cells(i, 1).Value                                          'add current ticker
+           ws.Cells(TickerRow, 12).Value = ws.Cells(TickerRow, 12).Value + ws.Cells(i, 7).Value         'add ticket total volume
+
+           YrCloseVal = ws.Cells(i, 6).Value
+           YearlyChange = YrCloseVal - YrOpenVal
+
+            If (YrOpenVal > 0) Then
+                PercentChange = (YearlyChange) / YrOpenVal
+            End If
+
+           ws.Cells(TickerRow, 10).Value = YearlyChange
+           ws.Range("J" & TickerRow).NumberFormat = "0.000000000000000"                         ' YearlyChange Formatting
+           ws.Cells(TickerRow, 11).Value = PercentChange
+           ws.Range("K" & TickerRow).NumberFormat = "0.00%"                                     ' Percentchange formatting
+
+
+           If (ws.Cells(TickerRow, 10).Value >= 0) Then                                          'Conditional formatting of Yearly Change
+
+                ws.Cells(TickerRow, 10).Interior.ColorIndex = 4
+           Else
+                 ws.Cells(TickerRow, 10).Interior.ColorIndex = 3
+
+           End If
+
+           YrOpenVal = ws.Cells(i + 1, 3).Value                                                     'set yropenvalue for next ticker
+           TickerRow = TickerRow + 1
+           ws.Cells(TickerRow, 12).Value = ws.Cells(i + 1, 7).Value                                 'set TotalVolume for next ticker
+           
+           
+        ElseIf (YrOpenVal = 0) Then
+            YrOpenVal = ws.Cells(i, 3).Value                                                       'set yropenvalue for first ticker
+            ws.Cells(TickerRow, 12).Value = ws.Cells(TickerRow, 12).Value + ws.Cells(i, 7).Value
+
+        Else
+            ws.Cells(TickerRow, 12).Value = ws.Cells(TickerRow, 12).Value + ws.Cells(i, 7).Value    ' same ticker keep adding volume
+
+        End If
+
+    Next i
+       
+       '========================== HARD =====================================
+       ws.Range("O2").Value = "Greatest % Increase"
+       ws.Range("O3").Value = "Greatest % Decrease"
+       ws.Range("O4").Value = "Greatest Total Volume"
+       ws.Range("P1").Value = "Ticker"
+       ws.Range("Q1").Value = "Value"
+       
+       LastTicker = ws.Cells(Rows.Count, 9).End(xlUp).Row                           ' Find last row of Ticker column
+       
+           
+       GrIncRow = 2
+       GrDecRow = 2
+       GrTotVolRow = 2
+       
+       For j = 2 To LastTicker
+       
+            If (ws.Cells(GrIncRow, 11).Value > ws.Cells(j + 1, 11).Value) Then      'Find greatest % increase
+            
+                                          
+            Else
+                 GrIncRow = j + 1
+                       
+            End If
+            
+            If (ws.Cells(j + 1, 11).Value < ws.Cells(GrDecRow, 11).Value) Then          'Find greatest % decrease
+            
+                    GrDecRow = j + 1
+                                          
+            Else
+                       
+            End If
+            
+            If (ws.Cells(GrTotVolRow, 12).Value > ws.Cells(j + 1, 12).Value) Then           'Find greatest total volume
+            
+                                          
+            Else
+                 GrTotVolRow = j + 1
+                       
+            End If
+       
+       Next j
+       
+      ws.Range("P2").Value = ws.Cells(GrIncRow, 9).Value
+      ws.Range("Q2").Value = ws.Cells(GrIncRow, 11).Value
+      ws.Range("P3").Value = ws.Cells(GrDecRow, 9).Value
+      ws.Range("Q3").Value = ws.Cells(GrDecRow, 11).Value
+      ws.Range("Q2:Q3").NumberFormat = "0.00%"
+      ws.Range("P4").Value = ws.Cells(GrTotVolRow, 9).Value
+      ws.Range("Q4").Value = ws.Cells(GrTotVolRow, 12).Value
+                     
+Next ws
+
+
+End Sub
+' --------------------------------------------------------------------------------
+ 
+
+
+
+
+

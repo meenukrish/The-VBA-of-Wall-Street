@@ -1,0 +1,50 @@
+Sub StockMarketData():
+
+' --------------------------------------------------------------------------------
+ 
+Dim TickerRow As Integer
+Dim AlreadyAdded As Boolean
+Dim CurrentVol As Single
+Dim ws As Worksheet
+Dim LastRow As Long
+
+
+
+'--------------------------------------------------------
+
+For Each ws In Worksheets
+
+ws.Range("I1") = "Ticker"
+ws.Range("J1") = "Total Stock Volume"
+TickerRow = 2
+
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    For i = 2 To LastRow
+    
+        If (ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value) Then   'current ticker is not equal to next ticker
+           ws.Cells(TickerRow, 9).Value = ws.Cells(i, 1).Value        'add ticker
+           ws.Cells(TickerRow, 10).Value = ws.Cells(TickerRow, 10).Value + ws.Cells(i, 7).Value 'add ticket total volume
+           TickerRow = TickerRow + 1
+         
+        Else
+            ws.Cells(TickerRow, 10).Value = ws.Cells(TickerRow, 10).Value + ws.Cells(i, 7).Value  ' same ticker keep adding volume
+             
+         End If
+       
+    Next i
+    
+    
+ 
+
+Next ws
+
+'--------------------------------------------------------
+
+
+End Sub
+' --------------------------------------------------------------------------------
+ 
+
+
+
